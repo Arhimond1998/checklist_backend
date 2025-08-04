@@ -4,9 +4,9 @@ from src.schemas import ChecklistCreate, ChecklistResponse, ChecklistUpdate
 from src.core.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter()
+router = APIRouter(prefix='/checklists')
 
-@router.post("/checklists/", response_model=ChecklistResponse)
+@router.post("/", response_model=ChecklistResponse)
 async def create_checklist(
     checklist: ChecklistCreate, 
     db: AsyncSession = Depends(get_db)
@@ -14,14 +14,14 @@ async def create_checklist(
     repo = ChecklistRepository(db)
     return await repo.create(checklist)
 
-@router.get("/checklists/", response_model=list[ChecklistResponse])
+@router.get("/", response_model=list[ChecklistResponse])
 async def read_checklists(
     db: AsyncSession = Depends(get_db)
 ):
     repo = ChecklistRepository(db)
     return await repo.get_all()
 
-@router.get("/checklists/{id_checklist}", response_model=ChecklistResponse)
+@router.get("/{id_checklist}", response_model=ChecklistResponse)
 async def read_checklist(
     id_checklist: int, 
     db: AsyncSession = Depends(get_db)
@@ -32,7 +32,7 @@ async def read_checklist(
         raise HTTPException(status_code=404, detail="checklist not found")
     return checklist
 
-@router.put("/checklists/{id_checklist}", response_model=ChecklistResponse)
+@router.put("/{id_checklist}", response_model=ChecklistResponse)
 async def update_checklist(
     id_checklist: int, 
     checklist: ChecklistUpdate,
@@ -44,7 +44,7 @@ async def update_checklist(
         raise HTTPException(status_code=404, detail="checklist not found")
     return updated_checklist
 
-@router.delete("/checklists/{id_checklist}")
+@router.delete("/{id_checklist}")
 async def delete_checklist(
     id_checklist: int, 
     db: AsyncSession = Depends(get_db)

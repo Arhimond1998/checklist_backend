@@ -5,6 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 from src.core.config import settings
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -18,7 +19,10 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+from src.core.database import Base  # noqa
+
+target_metadata = Base.metadata
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -32,6 +36,17 @@ def get_url():
     port = settings.PG_DATABASE_PORT
     return f"postgresql://{user}:{password}@{server}:{port}/{db}"
 
+
+cfg = dict(
+    target_metadata=target_metadata,
+    dialect_opts={"paramstyle": "named"},
+    version_table="checklist",
+    version_table_schema="alembic",
+    compare_type=True,
+    include_schemas=True,
+)
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -44,13 +59,9 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
-    context.configure(
-        url=url,
-        target_metadata=target_metadata,
-        literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
-    )
+    cfg["url"] = get_url()
+    cfg["literal_binds"] = (True,)
+    context.configure(**cfg)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -70,9 +81,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

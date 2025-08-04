@@ -1,8 +1,8 @@
 from fastapi.routing import APIRouter
-from endpoints import checklist
-from endpoints import constructor
+from src.api.endpoints import checklist
+from src.api.endpoints import user
 
-router = APIRouter('/api')
+router = APIRouter(prefix='/api')
 
 router.include_router(checklist.router)
-router.include_router(constructor.router)
+router.include_router(user.router)

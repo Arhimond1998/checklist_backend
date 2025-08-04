@@ -11,5 +11,5 @@ class ChecklistUpdate(ChecklistBase):
     ...
 
 class ChecklistResponse(BaseModel):
-    id_checklist: id
+    id_checklist: int
     model_config = ConfigDict(from_attributes=True)
