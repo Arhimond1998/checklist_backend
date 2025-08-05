@@ -20,7 +20,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from src.core.database import Base  # noqa
-
+from src.models import *  # noqa
 target_metadata = Base.metadata
 
 
@@ -34,7 +34,7 @@ def get_url():
     server = settings.PG_DATABASE_HOST
     db = settings.PG_DATABASE_DB
     port = settings.PG_DATABASE_PORT
-    return f"postgresql://{user}:{password}@{server}:{port}/{db}"
+    return f"postgresql+psycopg://{user}:{password}@{server}:{port}/{db}"
 
 
 cfg = dict(
@@ -46,8 +46,7 @@ cfg = dict(
     include_schemas=True,
 )
 
-
-def run_migrations_offline() -> None:
+def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -59,29 +58,31 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    cfg["url"] = get_url()
-    cfg["literal_binds"] = (True,)
+    cfg['url'] = get_url()
+    cfg['literal_binds'] = True,
     context.configure(**cfg)
 
     with context.begin_transaction():
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
+def run_migrations_online():
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """
+    configuration = config.get_section(config.config_ini_section)
+    configuration["sqlalchemy.url"] = get_url()
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
-
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        cfg['connection'] = connection
+        context.configure(**cfg)
 
         with context.begin_transaction():
             context.run_migrations()
