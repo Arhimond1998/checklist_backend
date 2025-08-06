@@ -1,8 +1,15 @@
+from fastapi import Depends
 from fastapi.routing import APIRouter
+
+from src.deps.auth import check_token
 from src.api.endpoints import checklist
 from src.api.endpoints import user
+from src.api.endpoints import auth
 
-router = APIRouter(prefix='/api')
+auth_router=APIRouter(prefix='/api')
+auth_router.include_router(auth.router)
 
-router.include_router(checklist.router)
-router.include_router(user.router)
+web_router = APIRouter(prefix='/api', dependencies=[Depends(check_token)])
+
+web_router.include_router(checklist.router)
+web_router.include_router(user.router)

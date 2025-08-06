@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     def PG_DATABASE_DSN(self):
         return f"postgresql+asyncpg://{self.PG_DATABASE_USER}:{self.PG_DATABASE_PASSWORD}@{self.PG_DATABASE_HOST}:{self.PG_DATABASE_PORT}/{self.PG_DATABASE_DB}"
     
+    SECRET_KEY: str = 'your-secret-key-in-env'
+    ALGORITHM: str = 'HS256'
     
 
 

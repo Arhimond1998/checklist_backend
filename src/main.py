@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
-from src.api import router
+from src.api import web_router, auth_router
 
 app = FastAPI(
     title="Check list",
@@ -10,9 +10,10 @@ app = FastAPI(
 )
 
 origins = [
-    "http://localhost:5173",
-    "localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://localhost:5174"
 ]
 
 app.add_middleware(
@@ -23,4 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+
+
+app.include_router(auth_router)
+app.include_router(web_router)

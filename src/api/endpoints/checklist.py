@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.repositories.checklist import ChecklistRepository
 from src.schemas import ChecklistCreate, ChecklistResponse, ChecklistUpdate
-from src.core.database import get_db
+from src.deps.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix='/checklists')

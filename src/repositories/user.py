@@ -1,7 +1,11 @@
+from fastapi import Depends
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.models import User
 from src.schemas import UserCreate, UserUpdate
+from src.deps.database import get_db
 
 class UserNotFound(Exception):
     ...
@@ -19,6 +23,10 @@ class UserRepository:
 
     async def get_by_id(self, id_user: int) -> User | None:
         result = await self.db.execute(select(User).filter(User.id_user == id_user))
+        return result.scalar_one_or_none()
+    
+    async def get_by_login(self, login: str) -> User | None:
+        result = await self.db.execute(select(User).filter(User.login == login))
         return result.scalar_one_or_none()
 
     async def get_all(self) -> list[User]:
@@ -53,3 +61,7 @@ class UserRepository:
         if not user:
             raise UserNotFound("No user")
         user.password = password
+
+
+def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
+    return UserRepository(db)
