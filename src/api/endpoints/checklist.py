@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.repositories.checklist import ChecklistRepository
-from src.schemas import ChecklistCreate, ChecklistResponse, ChecklistUpdate
+from src.repositories.user_checklist import UserChecklistRepository
+from src.schemas import ChecklistCreate, ChecklistResponse, ChecklistUpdate, UserChecklistCreate
 from src.deps.database import get_db
+from src.deps.auth import get_current_user
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix='/checklists')
@@ -9,17 +11,24 @@ router = APIRouter(prefix='/checklists')
 @router.post("/", response_model=ChecklistResponse)
 async def create_checklist(
     checklist: ChecklistCreate, 
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user),
 ):
     repo = ChecklistRepository(db)
-    return await repo.create(checklist)
+    new_checklist = await repo.create(checklist)
+    user_checklist_repo = UserChecklistRepository(db)
+    await user_checklist_repo.create(UserChecklistCreate(id_user=current_user.id_user, id_checklist=new_checklist.id_checklist))
+    
+    await db.commit()
+    return new_checklist
 
 @router.get("/", response_model=list[ChecklistResponse])
 async def read_checklists(
     db: AsyncSession = Depends(get_db)
 ):
     repo = ChecklistRepository(db)
-    return await repo.get_all()
+    checklists = await repo.get_all()
+    return checklists
 
 @router.get("/{id_checklist}", response_model=ChecklistResponse)
 async def read_checklist(

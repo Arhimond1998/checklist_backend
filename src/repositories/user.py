@@ -63,5 +63,5 @@ class UserRepository:
         user.password = password
 
 
-def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
+def get_user_repository(db: AsyncSession = Depends(get_db)):
     return UserRepository(db)

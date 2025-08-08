@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import Checklist
 from src.schemas import ChecklistCreate, ChecklistUpdate
 
+
 class ChecklistRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -34,3 +35,4 @@ class ChecklistRepository:
         await self.db.delete(checklist)
         await self.db.flush()
         return True
+    

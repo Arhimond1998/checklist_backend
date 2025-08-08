@@ -1,1 +1,6 @@
 .venv
+.vscode
+Dockerfile
+.gitignore
+uv.lock
+README.md

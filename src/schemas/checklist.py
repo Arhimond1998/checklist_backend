@@ -10,6 +10,6 @@ class ChecklistCreate(ChecklistBase):
 class ChecklistUpdate(ChecklistBase):
     ...
 
-class ChecklistResponse(BaseModel):
+class ChecklistResponse(ChecklistBase):
     id_checklist: int
     model_config = ConfigDict(from_attributes=True)

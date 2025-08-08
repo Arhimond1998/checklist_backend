@@ -6,4 +6,5 @@ from src.schemas.user import (  # noqa
     UserUpdate,
     UserLogin,
 )
+from src.schemas.user_checklist import UserChecklistCreate  # noqa
 from src.schemas.token import Token  # noqa
