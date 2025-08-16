@@ -10,6 +10,7 @@ app = FastAPI(title="Check list", version="0.1.0", on_startup=[init_migration])
 
 origins = [
     "http://localhost:3000",
+    "http://localhost",
     "http://frontend",
     "http://127.0.0.1:3000",
     "http://127.0.0.1",

@@ -24,7 +24,7 @@ class FileRepository:
         file_path = f"{self.user_path}/{filename}"
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
-        return file_path
+        return f'/{file_path}'
 
     async def create_bunch(self, files: list[UploadFile]) -> list[str]:
         result = []
