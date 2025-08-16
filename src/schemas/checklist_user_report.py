@@ -11,7 +11,7 @@ class ChecklistUserReportBase(BaseModel):
     dt: datetime = datetime.now()
 
 
-class ChecklistUserReportCreate(ChecklistUserReportBase): 
+class ChecklistUserReportCreate(BaseModel): 
     id_checklist: int
     max_score: int
     score: int

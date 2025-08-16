@@ -5,15 +5,15 @@ from src.models import User
 from src.schemas import ChecklistUserReportCreate, ChecklistUserReportUpdate
 
 
-class ChecklistUserReportUserReportRepository:
+class ChecklistUserReportRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def create(
-        self, ChecklistUserReport: ChecklistUserReportCreate, user: User
+        self, create_data: ChecklistUserReportCreate, user: User
     ) -> ChecklistUserReport:
         new_obj = ChecklistUserReport(
-            **ChecklistUserReport.model_dump() | {'id_user': user.id_user}
+            **(create_data.model_dump() | {"id_user": user.id_user})
         )
         self.db.add(new_obj)
         await self.db.flush()

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.checklist_user_report import (
-    ChecklistUserReportUserReportRepository,
+    ChecklistUserReportRepository,
 )
 
 from src.schemas import (
@@ -19,5 +19,7 @@ async def create_user_report(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    repo = ChecklistUserReportUserReportRepository(db)
-    return await repo.create(data, current_user)
+    repo = ChecklistUserReportRepository(db)
+    obj = await repo.create(data, current_user)
+    await db.commit()
+    return obj
