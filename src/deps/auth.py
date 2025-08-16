@@ -26,7 +26,7 @@ async def get_current_user(
         login = payload.get("sub")
         if login is None:
             raise credentials_exception
-    except exceptions.InvalidTokenError:
+    except exceptions.JWTError:
         raise credentials_exception
     user = await user_repo.get_by_login(login)
     if user is None:
@@ -47,6 +47,6 @@ async def check_token(token: Annotated[str, Depends(oauth2_scheme)]):
         login = payload.get("sub")
         if login is None:
             raise credentials_exception
-    except exceptions.InvalidTokenError:
+    except exceptions.JWTError:
         raise credentials_exception
     return True

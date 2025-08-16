@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = 'your-secret-key-in-env'
     ALGORITHM: str = 'HS256'
     
+    UPLOAD_DIR: str = 'static'
+    
+    HOST_ADDRESS: str = 'http://127.0.0.1:8080'
+    
 
 
 
