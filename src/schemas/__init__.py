@@ -13,4 +13,9 @@ from src.schemas.user import (  # noqa
 )
 from src.schemas.user_checklist import UserChecklistCreate  # noqa
 from src.schemas.token import Token  # noqa
-from src.schemas.checklist_user_report import ChecklistUserReportCreate, ChecklistUserReportUpdate  # noqa
+from src.schemas.checklist_user_report import (
+    ChecklistUserReportCreate,
+    ChecklistUserReportUpdate,
+    ChecklistUserReportTitle,
+    ChecklistUserReportFull,
+)  # noqa

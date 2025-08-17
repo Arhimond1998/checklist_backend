@@ -2,7 +2,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import ChecklistUserReport
 from src.models import User
-from src.schemas import ChecklistUserReportCreate, ChecklistUserReportUpdate
+from src.models import Checklist
+from src.schemas import (
+    ChecklistUserReportCreate,
+    ChecklistUserReportUpdate,
+    ChecklistUserReportTitle,
+    ChecklistUserReportFull,
+)
 
 
 class ChecklistUserReportRepository:
@@ -33,6 +39,77 @@ class ChecklistUserReportRepository:
     async def get_all(self) -> list[ChecklistUserReport]:
         result = await self.db.execute(select(ChecklistUserReport))
         return result.scalars().all()
+
+    async def get_all_titles(self) -> list[ChecklistUserReportTitle]:
+        result = await self.db.execute(
+            select(
+                ChecklistUserReport.id_checklist_user_report,
+                ChecklistUserReport.id_checklist,
+                ChecklistUserReport.id_user,
+                ChecklistUserReport.score,
+                ChecklistUserReport.max_score,
+                ChecklistUserReport.dt,
+                User.surname.concat(" ")
+                .concat(User.name)
+                .concat(" ")
+                .concat(User.patronymic)
+                .label("user_fullname"),
+                Checklist.title,
+            )
+            .join(User, User.id_user == ChecklistUserReport.id_user)
+            .join(Checklist, Checklist.id_checklist == ChecklistUserReport.id_checklist)
+        )
+        return [
+            ChecklistUserReportTitle(
+                id_checklist_user_report=r.id_checklist_user_report,
+                id_checklist=r.id_checklist,
+                id_user=r.id_user,
+                score=r.score,
+                max_score=r.max_score,
+                dt=r.dt,
+                title=r.title,
+                user_fullname=r.user_fullname,
+            )
+            for r in result.fetchall()
+        ]
+
+    async def get_by_id_full(
+        self, id_checklist_user_report: int
+    ) -> ChecklistUserReportFull | None:
+        result = await self.db.execute(
+            select(
+                ChecklistUserReport.id_checklist_user_report,
+                ChecklistUserReport.id_checklist,
+                ChecklistUserReport.id_user,
+                ChecklistUserReport.score,
+                ChecklistUserReport.max_score,
+                ChecklistUserReport.dt,
+                ChecklistUserReport.data,
+                User.surname.concat(" ")
+                .concat(User.name)
+                .concat(" ")
+                .concat(User.patronymic)
+                .label("user_fullname"),
+                Checklist.title,
+            )
+            .join(User, User.id_user == ChecklistUserReport.id_user)
+            .join(Checklist, Checklist.id_checklist == ChecklistUserReport.id_checklist)
+            .where(
+                ChecklistUserReport.id_checklist_user_report == id_checklist_user_report
+            )
+        )
+        record = result.fetchone()
+        return ChecklistUserReportFull(
+            id_checklist_user_report=record.id_checklist_user_report,
+            id_checklist=record.id_checklist,
+            id_user=record.id_user,
+            score=record.score,
+            max_score=record.max_score,
+            dt=record.dt,
+            title=record.title,
+            user_fullname=record.user_fullname,
+            data=record.data,
+        )
 
     async def update(
         self,
