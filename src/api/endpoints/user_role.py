@@ -4,7 +4,7 @@ from src.schemas import UserCreate, UserUpdate, UserResponse
 from src.deps.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix='/users', tags=['Users'])
+router = APIRouter(prefix='/user_roles', tags=['User role'])
 
 @router.post("/", response_model=UserResponse)
 async def create_user(

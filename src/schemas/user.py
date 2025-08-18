@@ -28,6 +28,7 @@ class UserResponseLogin(BaseModel):
     mail: str | None = None
     login: str
     access_token: str
+    roles: list[str] | None = None
 
 class UserResponse(BaseModel):
     id_user: int

@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.services.auth import auth_service
 from src.repositories.checklist import ChecklistRepository
 from src.repositories.file import FileRepository, get_file_repository
 from src.repositories.user_checklist import UserChecklistRepository
@@ -14,11 +16,12 @@ from src.schemas import (
 from src.deps.database import get_db
 from src.deps.auth import get_current_user
 
-router = APIRouter(prefix="/checklists")
-
+router = APIRouter(prefix="/checklists", tags=['Checklist'])
 
 @router.post("/", response_model=ChecklistResponse)
+@auth_service.check_roles(['admin'])
 async def create_checklist(
+    request: Request,
     checklist: ChecklistCreate,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -47,6 +50,7 @@ async def create_user_report(
 
 
 @router.post("/upload")
+@auth_service.check_roles(['admin'])
 async def upload_photo(
     files: list[UploadFile], file_repo: FileRepository = Depends(get_file_repository)
 ):
@@ -77,6 +81,7 @@ async def read_checklist(id_checklist: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{id_checklist}", response_model=ChecklistResponse)
+@auth_service.check_roles(['admin'])
 async def update_checklist(
     id_checklist: int, checklist: ChecklistUpdate, db: AsyncSession = Depends(get_db)
 ):
@@ -89,6 +94,7 @@ async def update_checklist(
 
 
 @router.delete("/{id_checklist}")
+@auth_service.check_roles(['admin'])
 async def delete_checklist(id_checklist: int, db: AsyncSession = Depends(get_db)):
     repo = ChecklistRepository(db)
     success = await repo.delete(id_checklist)
