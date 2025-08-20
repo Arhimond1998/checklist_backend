@@ -16,10 +16,11 @@ from src.schemas import (
 from src.deps.database import get_db
 from src.deps.auth import get_current_user
 
-router = APIRouter(prefix="/checklists", tags=['Checklist'])
+router = APIRouter(prefix="/checklists", tags=["Checklist"])
+
 
 @router.post("/", response_model=ChecklistResponse)
-@auth_service.check_roles(['admin'])
+@auth_service.check_roles(["admin"])
 async def create_checklist(
     request: Request,
     checklist: ChecklistCreate,
@@ -50,9 +51,11 @@ async def create_user_report(
 
 
 @router.post("/upload")
-@auth_service.check_roles(['admin'])
+@auth_service.check_roles(["admin"])
 async def upload_photo(
-    files: list[UploadFile], file_repo: FileRepository = Depends(get_file_repository)
+    request: Request,
+    files: list[UploadFile],
+    file_repo: FileRepository = Depends(get_file_repository),
 ):
     return await file_repo.create_bunch(files)
 
@@ -81,9 +84,12 @@ async def read_checklist(id_checklist: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{id_checklist}", response_model=ChecklistResponse)
-@auth_service.check_roles(['admin'])
+@auth_service.check_roles(["admin"])
 async def update_checklist(
-    id_checklist: int, checklist: ChecklistUpdate, db: AsyncSession = Depends(get_db)
+    request: Request,
+    id_checklist: int,
+    checklist: ChecklistUpdate,
+    db: AsyncSession = Depends(get_db),
 ):
     repo = ChecklistRepository(db)
     updated_checklist = await repo.update(id_checklist, checklist)
@@ -94,8 +100,10 @@ async def update_checklist(
 
 
 @router.delete("/{id_checklist}")
-@auth_service.check_roles(['admin'])
-async def delete_checklist(id_checklist: int, db: AsyncSession = Depends(get_db)):
+@auth_service.check_roles(["admin"])
+async def delete_checklist(
+    request: Request, id_checklist: int, db: AsyncSession = Depends(get_db)
+):
     repo = ChecklistRepository(db)
     success = await repo.delete(id_checklist)
     if not success:
