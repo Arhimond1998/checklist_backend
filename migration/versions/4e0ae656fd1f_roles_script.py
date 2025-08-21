@@ -25,7 +25,7 @@ def upgrade() -> None:
     op.execute(
         """
         insert into checklist.t_role(name, code)
-        values( 'Администратор', 'admin'),
+        values('Администратор', 'admin'),
         ('Смертный', 'report_user')
         """
     )

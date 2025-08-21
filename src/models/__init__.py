@@ -4,3 +4,8 @@ from src.models.user import User  # noqa
 from src.models.user_checklist import UserChecklist  # noqa
 from src.models.user_role import UserRole  # noqa
 from src.models.checklist_user_report import ChecklistUserReport  # noqa
+from src.models.employee import Employee  # noqa
+from src.models.store import Store  # noqa
+from src.models.store_employee import StoreEmployee  # noqa
+from src.models.store_user import StoreUser  # noqa
+from src.models.store_checklist import StoreChecklist  # noqa

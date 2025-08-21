@@ -12,6 +12,7 @@ from src.schemas import (
     UserChecklistCreate,
     ChecklistTitlesResponse,
     ChecklistUserReportCreate,
+    ComboboxResponse,
 )
 from src.deps.database import get_db
 from src.deps.auth import get_current_user
@@ -49,6 +50,11 @@ async def create_user_report(
     repo = ChecklistRepository(db)
     return await repo.create_user_report(data, current_user)
 
+
+@router.post("/combobox", response_model=list[ComboboxResponse[int]])
+async def get_combobox(request: Request, db: AsyncSession = Depends(get_db)):
+    role_repo = ChecklistRepository(db)
+    return await role_repo.get_combo()
 
 @router.post("/upload")
 @auth_service.check_roles(["admin"])

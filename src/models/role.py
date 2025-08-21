@@ -8,4 +8,4 @@ class Role(Base):
 
     id_role = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), index=True)
-    code = Column(String(255), index=True)
+    code = Column(String(255), index=True, unique=True)

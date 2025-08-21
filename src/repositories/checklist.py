@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import Checklist
 from src.models import UserChecklist
-from src.schemas import ChecklistCreate, ChecklistUpdate
+from src.schemas import ChecklistCreate, ChecklistUpdate, ComboboxResponse
 
 
 class ChecklistRepository:
@@ -21,6 +21,17 @@ class ChecklistRepository:
             select(Checklist).filter(Checklist.id_checklist == id_checklist)
         )
         return result.scalar_one_or_none()
+    
+    async def get_combo(self) -> list[ComboboxResponse[int]]:
+        result = []
+        for record in (await self.db.execute(select(Checklist))).scalars().all():
+            result.append(
+                ComboboxResponse[int](
+                    label=record.title,
+                    value=record.id_checklist,
+                )
+            )
+        return result
 
     async def get_all(self) -> list[Checklist]:
         result = await self.db.execute(select(Checklist))

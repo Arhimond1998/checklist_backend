@@ -12,7 +12,7 @@ from src.schemas import (
 from src.deps.database import get_db
 from src.deps.auth import get_current_user
 
-router = APIRouter(prefix="/checklist_user_report", tags=['Report'])
+router = APIRouter(prefix="/checklist_user_reports", tags=["Report"])
 
 
 @router.post("/")

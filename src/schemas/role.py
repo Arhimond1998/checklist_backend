@@ -9,8 +9,8 @@ class RoleBase(BaseModel):
 class RoleCreate(RoleBase): ...
 
 
-class RoleUpdate(RoleBase):
-    id_role: int
+class RoleUpdate(RoleCreate): ...
+
 
 class RoleResponse(BaseModel):
     id_role: int

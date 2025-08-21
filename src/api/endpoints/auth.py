@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, exceptions, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.repositories.user import UserRepository
-from src.schemas import UserCreate, UserLogin, UserResponse, UserResponseLogin
+from src.schemas import UserLogin, UserResponseLogin
 from src.deps.database import get_db
 from src.services.auth import auth_service
 from src.deps.auth import check_token
@@ -46,15 +46,3 @@ async def login(user: UserLogin, db: AsyncSession = Depends(get_db)):
         access_token=access_token,
         roles=roles,
     )
-
-
-@router.post("/register", response_model=UserResponse)
-async def register(
-    user: UserCreate,
-    db: AsyncSession = Depends(get_db),
-):
-    user_repo = UserRepository(db)
-    user.password = auth_service.hash_password(user.password)
-    new_user = await user_repo.create(user)
-    await db.commit()
-    return new_user
