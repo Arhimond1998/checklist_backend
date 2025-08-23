@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models import User, UserRole, Role
-from src.schemas import UserCreate, UserUpdate, ComboboxResponse
+from src.schemas import UserCreate, UserUpdate, ComboboxResponse, ComboboxTreeResponse
 from src.deps.database import get_db
 
 
@@ -39,6 +39,24 @@ class UserRepository:
                         + (record.patronymic or "")
                     ).strip(),
                     value=record.id_user,
+                )
+            )
+        return result
+    
+    async def get_tree_combo(self) -> list[ComboboxTreeResponse[int]]:
+        result = []
+        for record in (await self.db.execute(select(User))).scalars().all():
+            result.append(
+                ComboboxTreeResponse[int](
+                    name=(
+                        (record.surname or "")
+                        + " "
+                        + (record.name or "")
+                        + " "
+                        + (record.patronymic or "")
+                    ).strip(),
+                    id=record.id_user,
+                    id_parent=record.id_parent,
                 )
             )
         return result

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.repositories.user import UserRepository
-from src.schemas import UserCreate, UserUpdate, UserResponse, ComboboxResponse
+from src.schemas import UserCreate, UserUpdate, UserResponse, ComboboxResponse, ComboboxTreeResponse
 from src.deps.database import get_db
 from src.services.auth import auth_service
 
@@ -26,6 +26,11 @@ async def get_combobox(request: Request, db: AsyncSession = Depends(get_db)):
     user_repo = UserRepository(db)
     return await user_repo.get_combo()
 
+
+@router.post("/tree_combobox", response_model=list[ComboboxTreeResponse[int]])
+async def get_tree_combobox(request: Request, db: AsyncSession = Depends(get_db)):
+    user_repo = UserRepository(db)
+    return await user_repo.get_tree_combo()
 
 @router.get("/", response_model=list[UserResponse])
 async def read_users(db: AsyncSession = Depends(get_db)):
@@ -51,6 +56,7 @@ async def update_user(
     updated_user = await repo.update(user_id, user)
     if not updated_user:
         raise HTTPException(status_code=404, detail="user not found")
+    await db.commit()
     return updated_user
 
 
@@ -63,4 +69,5 @@ async def delete_user(
     success = await repo.delete(user_id)
     if not success:
         raise HTTPException(status_code=404, detail="user not found")
+    await db.commit()
     return {"message": "user deleted"}

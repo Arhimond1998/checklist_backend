@@ -14,3 +14,4 @@ class User(Base):
 
     login = Column(String(150), unique=True)
     password = Column(String(150))
+    id_parent = Column(Integer, nullable=True)
