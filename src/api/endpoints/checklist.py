@@ -11,7 +11,6 @@ from src.schemas import (
     ChecklistUpdate,
     UserChecklistCreate,
     ChecklistTitlesResponse,
-    ChecklistUserReportCreate,
     ComboboxResponse,
 )
 from src.deps.database import get_db
@@ -21,7 +20,7 @@ router = APIRouter(prefix="/checklists", tags=["Checklist"])
 
 
 @router.post("/", response_model=ChecklistResponse)
-@auth_service.check_roles(["admin"])
+@auth_service.check_components(["constructor"])
 async def create_checklist(
     request: Request,
     checklist: ChecklistCreate,
@@ -41,23 +40,13 @@ async def create_checklist(
     return new_checklist
 
 
-@router.post("/save_user_report")
-async def create_user_report(
-    data: ChecklistUserReportCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
-    repo = ChecklistRepository(db)
-    return await repo.create_user_report(data, current_user)
-
-
 @router.post("/combobox", response_model=list[ComboboxResponse[int]])
 async def get_combobox(request: Request, db: AsyncSession = Depends(get_db)):
     role_repo = ChecklistRepository(db)
     return await role_repo.get_combo()
 
 @router.post("/upload")
-@auth_service.check_roles(["admin"])
+@auth_service.check_components(["constructor"])
 async def upload_photo(
     request: Request,
     files: list[UploadFile],
@@ -90,7 +79,7 @@ async def read_checklist(id_checklist: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{id_checklist}", response_model=ChecklistResponse)
-@auth_service.check_roles(["admin"])
+@auth_service.check_components(["constructor"])
 async def update_checklist(
     request: Request,
     id_checklist: int,
@@ -106,7 +95,7 @@ async def update_checklist(
 
 
 @router.delete("/{id_checklist}")
-@auth_service.check_roles(["admin"])
+@auth_service.check_components(["constructor"])
 async def delete_checklist(
     request: Request, id_checklist: int, db: AsyncSession = Depends(get_db)
 ):

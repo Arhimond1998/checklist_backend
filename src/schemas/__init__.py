@@ -40,3 +40,13 @@ from src.schemas.store_checklist import (  # noqa
     StoreChecklistResponse,
     StoreChecklistFullResponse,
 )
+from src.schemas.component import (  # noqa
+    ComponentCreate,
+    ComponentUpdate,
+    ComponentResponse,
+)
+from src.schemas.role_component import (  # noqa
+    RoleComponentCreate,
+    RoleComponentFullResponse,
+    RoleComponentResponse,
+)

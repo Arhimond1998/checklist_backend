@@ -8,7 +8,6 @@ class UserBase(BaseModel):
     mail: str | None = None
     login: str
     password: str
-    id_parent: int | None = None
 
 
 class UserCreate(UserBase): ...
@@ -34,6 +33,7 @@ class UserResponseLogin(BaseModel):
     login: str
     access_token: str
     roles: list[str] | None = None
+    components: list[str] | None = None
 
 class UserResponse(BaseModel):
     id_user: int
@@ -42,6 +42,5 @@ class UserResponse(BaseModel):
     patronymic: str | None = None
     mail: str | None = None
     login: str
-    id_parent: int | None = None
 
     model_config = ConfigDict(from_attributes=True)

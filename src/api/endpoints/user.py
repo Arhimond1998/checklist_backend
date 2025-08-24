@@ -27,11 +27,6 @@ async def get_combobox(request: Request, db: AsyncSession = Depends(get_db)):
     return await user_repo.get_combo()
 
 
-@router.post("/tree_combobox", response_model=list[ComboboxTreeResponse[int]])
-async def get_tree_combobox(request: Request, db: AsyncSession = Depends(get_db)):
-    user_repo = UserRepository(db)
-    return await user_repo.get_tree_combo()
-
 @router.get("/", response_model=list[UserResponse])
 async def read_users(db: AsyncSession = Depends(get_db)):
     repo = UserRepository(db)

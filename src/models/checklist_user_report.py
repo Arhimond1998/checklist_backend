@@ -11,6 +11,7 @@ class ChecklistUserReport(Base):
     id_checklist_user_report = Column(Integer, primary_key=True, index=True)
     id_checklist = Column(Integer)
     id_user = Column(Integer)
+    id_employee = Column(Integer)
     max_score = Column(Integer)
     score = Column(Integer)
     data = Column(JSONB())

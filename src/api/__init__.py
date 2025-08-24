@@ -13,6 +13,8 @@ from src.api.endpoints import store_user
 from src.api.endpoints import store_employee
 from src.api.endpoints import employee
 from src.api.endpoints import store_checklist
+from src.api.endpoints import component
+from src.api.endpoints import role_component
 
 auth_router = APIRouter(prefix="/api")
 auth_router.include_router(auth.router)
@@ -29,3 +31,5 @@ web_router.include_router(store_user.router)
 web_router.include_router(store_employee.router)
 web_router.include_router(employee.router)
 web_router.include_router(store_checklist.router)
+web_router.include_router(component.router)
+web_router.include_router(role_component.router)

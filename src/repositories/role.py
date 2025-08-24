@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import Role
-from src.schemas import RoleCreate, RoleUpdate, ComboboxResponse
+from src.schemas import RoleCreate, RoleUpdate, ComboboxResponse, ComboboxTreeResponse
 
 
 class RoleRepository:
@@ -32,6 +32,20 @@ class RoleRepository:
                         (record.name or "") + " (" + (record.code or "") + ")"
                     ).strip(),
                     value=record.id_role,
+                )
+            )
+        return result
+
+    async def get_tree_combo(self) -> list[ComboboxTreeResponse[int]]:
+        result = []
+        for record in (await self.db.execute(select(Role))).scalars().all():
+            result.append(
+                ComboboxTreeResponse[int](
+                    name=(
+                        (record.name or "") + " (" + (record.code or "") + ")"
+                    ).strip(),
+                    id=record.id_role,
+                    id_parent=record.id_parent,
                 )
             )
         return result

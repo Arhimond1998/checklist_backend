@@ -17,7 +17,7 @@ class StoreChecklistRepository:
 
     async def get_by_id(self, id_entity: int) -> StoreChecklist | None:
         result = await self.db.execute(
-            select(StoreChecklist).filter(StoreChecklist.id_store_Checklist == id_entity)
+            select(StoreChecklist).filter(StoreChecklist.id_store_checklist == id_entity)
         )
         return result.scalar_one_or_none()
     

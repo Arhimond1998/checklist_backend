@@ -34,6 +34,30 @@ class AuthService:
             return wrapped
 
         return decorator
+    
+    @staticmethod
+    def check_components(components: list[str]):
+        """
+        Декоратор на проверку доступных  компонент
+        """
+
+        def decorator(func):
+            @wraps(func)
+            async def wrapped(*args, **kwargs):
+                headers = kwargs.get("request").headers
+                token = headers["Authorization"].split(" ")[-1]
+                data = AuthService.decode_access_token(token)
+                user_components = data['components']
+                if len(set(user_components) & set(components)) == 0:
+                    raise HTTPException(
+                        status_code=403, detail="У вас нет прав доступа"
+                    )
+                res = await func(*args, **kwargs)
+                return res
+
+            return wrapped
+
+        return decorator
 
     @staticmethod
     def my_decorator(func):

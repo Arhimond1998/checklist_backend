@@ -11,11 +11,13 @@ from src.schemas import (
 )
 from src.deps.database import get_db
 from src.deps.auth import get_current_user
+from src.services.auth import auth_service
 
 router = APIRouter(prefix="/checklist_user_reports", tags=["Report"])
 
 
 @router.post("/")
+@auth_service.check_components(["report"])
 async def create_user_report(
     data: ChecklistUserReportCreate,
     db: AsyncSession = Depends(get_db),

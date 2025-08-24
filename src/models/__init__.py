@@ -9,3 +9,5 @@ from src.models.store import Store  # noqa
 from src.models.store_employee import StoreEmployee  # noqa
 from src.models.store_user import StoreUser  # noqa
 from src.models.store_checklist import StoreChecklist  # noqa
+from src.models.component import Component  # noqa
+from src.models.role_component import RoleComponent  # noqa

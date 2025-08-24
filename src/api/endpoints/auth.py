@@ -33,8 +33,9 @@ async def login(user: UserLogin, db: AsyncSession = Depends(get_db)):
         )
     access_token_expires = timedelta(hours=12)
     roles = await user_repo.get_roles(user_db.id_user)
+    components = await user_repo.get_components(user_db.id_user)
     access_token = auth_service.create_access_token(
-        data={"sub": user_db.login, "roles": roles}, expires_delta=access_token_expires
+        data={"sub": user_db.login, "roles": roles, "components": components}, expires_delta=access_token_expires
     )
     return UserResponseLogin(
         id_user=user_db.id_user,
@@ -45,4 +46,5 @@ async def login(user: UserLogin, db: AsyncSession = Depends(get_db)):
         login=user_db.login,
         access_token=access_token,
         roles=roles,
+        components=components,
     )

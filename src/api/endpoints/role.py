@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.repositories.role import RoleRepository
-from src.schemas import RoleCreate, RoleUpdate, RoleResponse, ComboboxResponse
+from src.schemas import RoleCreate, RoleUpdate, RoleResponse, ComboboxResponse, ComboboxTreeResponse
 from src.deps.database import get_db
 from src.services.auth import auth_service
 
@@ -30,6 +30,11 @@ async def read_roles(db: AsyncSession = Depends(get_db)):
 async def get_combobox(request: Request, db: AsyncSession = Depends(get_db)):
     role_repo = RoleRepository(db)
     return await role_repo.get_combo()
+
+@router.post("/tree_combobox", response_model=list[ComboboxTreeResponse[int]])
+async def get_tree_combobox(request: Request, db: AsyncSession = Depends(get_db)):
+    role_repo = RoleRepository(db)
+    return await role_repo.get_tree_combo()
 
 
 @router.get("/{role_id}", response_model=RoleResponse)
