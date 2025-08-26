@@ -13,7 +13,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase): ...
 
 
-class UserUpdate(UserBase): 
+class UserUpdate(BaseModel): 
     name: str
     surname: str | None = None
     patronymic: str | None = None
