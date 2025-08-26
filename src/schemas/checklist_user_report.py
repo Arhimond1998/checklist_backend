@@ -17,6 +17,7 @@ class ChecklistUserReportTitle(BaseModel):
     id_checklist: int
     id_user: int
     id_employee: int | None = None
+    id_store: int
     score: int
     max_score: int
     dt: datetime

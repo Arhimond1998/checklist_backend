@@ -8,6 +8,7 @@ from src.schemas import (
     ChecklistUserReportCreate,
     ChecklistUserReportTitle,
     ChecklistUserReportFull,
+    Filters
 )
 from src.deps.database import get_db
 from src.deps.auth import get_current_user
@@ -30,11 +31,11 @@ async def create_user_report(
     return obj
 
 
-@router.get("/titles", response_model=list[ChecklistUserReportTitle])
-async def read_titles(db: AsyncSession = Depends(get_db)):
+@router.post("/titles", response_model=list[ChecklistUserReportTitle])
+async def read_titles(filters: Filters, db: AsyncSession = Depends(get_db)):
     repo = ChecklistUserReportRepository(db)
 
-    return await repo.get_all_titles()
+    return await repo.get_all_titles(filters)
 
 
 @router.get("/{id_checklist_user_report}", response_model=ChecklistUserReportFull)

@@ -11,12 +11,18 @@ from src.schemas import (
     ChecklistUserReportUpdate,
     ChecklistUserReportTitle,
     ChecklistUserReportFull,
+    Filters,
 )
+from src.repositories.base import RepositoryBase
 
 
-class ChecklistUserReportRepository:
+class ChecklistUserReportRepository(
+    RepositoryBase[
+        ChecklistUserReport, ChecklistUserReportCreate, ChecklistUserReportUpdate
+    ]
+):
     def __init__(self, db: AsyncSession):
-        self.db = db
+        super().__init__(ChecklistUserReport, db)
 
     async def create(
         self, create_data: ChecklistUserReportCreate, user: User
@@ -43,8 +49,8 @@ class ChecklistUserReportRepository:
         result = await self.db.execute(select(ChecklistUserReport))
         return result.scalars().all()
 
-    async def get_all_titles(self) -> list[ChecklistUserReportTitle]:
-        result = await self.db.execute(
+    async def get_all_titles(self, filters: Filters) -> list[ChecklistUserReportTitle]:
+        stmt = (
             select(
                 ChecklistUserReport.id_checklist_user_report,
                 ChecklistUserReport.id_checklist,
@@ -64,15 +70,23 @@ class ChecklistUserReportRepository:
                 .concat(Employee.patronymic)
                 .label("employee_fullname"),
                 Checklist.title,
-                Store.name.label('name_store'),
-                Store.code.label('code_store'),
+                Store.name.label("name_store"),
+                Store.code.label("code_store"),
+                Store.id_store,
             )
             .join(User, User.id_user == ChecklistUserReport.id_user)
             .join(Checklist, Checklist.id_checklist == ChecklistUserReport.id_checklist)
-            .join(StoreChecklist, StoreChecklist.id_checklist == ChecklistUserReport.id_checklist)
+            .join(
+                StoreChecklist,
+                StoreChecklist.id_checklist == ChecklistUserReport.id_checklist,
+            )
             .join(Store, Store.id_store == StoreChecklist.id_store)
-            .outerjoin(Employee, Employee.id_employee == ChecklistUserReport.id_employee)
+            .outerjoin(
+                Employee, Employee.id_employee == ChecklistUserReport.id_employee
+            )
         )
+        stmt = self.apply_filters(stmt, filters)
+        result = (await self.db.execute(stmt)).fetchall()
         return [
             ChecklistUserReportTitle(
                 id_checklist_user_report=r.id_checklist_user_report,
@@ -87,8 +101,9 @@ class ChecklistUserReportRepository:
                 employee_fullname=r.employee_fullname,
                 name_store=r.name_store,
                 code_store=r.code_store,
+                id_store=r.id_store,
             )
-            for r in result.fetchall()
+            for r in result
         ]
 
     async def get_by_id_full(
@@ -147,3 +162,7 @@ class ChecklistUserReportRepository:
             await self.db.delete(db_obj)
         await self.db.flush()
         return True
+
+
+def get_repository(db: AsyncSession) -> ChecklistUserReportRepository:
+    return ChecklistUserReportRepository(db)
