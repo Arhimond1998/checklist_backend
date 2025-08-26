@@ -56,7 +56,7 @@ class UserRepository:
         for k, v in user_update.model_dump().items():
             setattr(user, k, v)
         await self.db.flush()
-        return True
+        return user
 
     async def get_roles(self, id_user: int) -> list[str]:
         return (
