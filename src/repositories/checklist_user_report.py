@@ -3,6 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import ChecklistUserReport
 from src.models import User
 from src.models import Checklist
+from src.models import Employee
+from src.models import StoreChecklist
+from src.models import Store
 from src.schemas import (
     ChecklistUserReportCreate,
     ChecklistUserReportUpdate,
@@ -46,6 +49,7 @@ class ChecklistUserReportRepository:
                 ChecklistUserReport.id_checklist_user_report,
                 ChecklistUserReport.id_checklist,
                 ChecklistUserReport.id_user,
+                ChecklistUserReport.id_employee,
                 ChecklistUserReport.score,
                 ChecklistUserReport.max_score,
                 ChecklistUserReport.dt,
@@ -54,21 +58,35 @@ class ChecklistUserReportRepository:
                 .concat(" ")
                 .concat(User.patronymic)
                 .label("user_fullname"),
+                Employee.surname.concat(" ")
+                .concat(Employee.name)
+                .concat(" ")
+                .concat(Employee.patronymic)
+                .label("employee_fullname"),
                 Checklist.title,
+                Store.name.label('name_store'),
+                Store.code.label('code_store'),
             )
             .join(User, User.id_user == ChecklistUserReport.id_user)
             .join(Checklist, Checklist.id_checklist == ChecklistUserReport.id_checklist)
+            .join(StoreChecklist, StoreChecklist.id_checklist == ChecklistUserReport.id_checklist)
+            .join(Store, Store.id_store == StoreChecklist.id_store)
+            .outerjoin(Employee, Employee.id_employee == ChecklistUserReport.id_employee)
         )
         return [
             ChecklistUserReportTitle(
                 id_checklist_user_report=r.id_checklist_user_report,
                 id_checklist=r.id_checklist,
+                id_employee=r.id_employee,
                 id_user=r.id_user,
                 score=r.score,
                 max_score=r.max_score,
                 dt=r.dt,
                 title=r.title,
                 user_fullname=r.user_fullname,
+                employee_fullname=r.employee_fullname,
+                name_store=r.name_store,
+                code_store=r.code_store,
             )
             for r in result.fetchall()
         ]

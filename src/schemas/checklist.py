@@ -6,10 +6,11 @@ class ChecklistBase(BaseModel):
     data: dict
 
 
-class ChecklistCreate(ChecklistBase): ...
+class ChecklistCreate(ChecklistBase):
+    id_store: list[int]
 
 
-class ChecklistUpdate(ChecklistBase): ...
+class ChecklistUpdate(ChecklistCreate): ...
 
 
 class ChecklistResponse(ChecklistBase):

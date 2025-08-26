@@ -1,33 +1,39 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.models import Employee
-from src.schemas import EmployeeCreate, EmployeeUpdate, ComboboxResponse
+from src.models import Employee, StoreEmployee
+from src.schemas import EmployeeCreate, EmployeeUpdate, ComboboxResponse, Filters
+from src.repositories.base import RepositoryBase
 
 
-class EmployeeRepository:
+class EmployeeRepository(RepositoryBase[Employee, EmployeeCreate, EmployeeUpdate]):
     def __init__(self, db: AsyncSession):
-        self.db = db
+        super().__init__(Employee, db)
 
     async def create(self, create_dto: EmployeeCreate) -> Employee:
-        new_obj = Employee(**create_dto.model_dump())
-        self.db.add(new_obj)
-        await self.db.flush()
-        await self.db.refresh(new_obj)
-        return new_obj
+        return await super().create(create_dto)
 
     async def get_by_id(self, id_entity: int) -> Employee | None:
-        result = await self.db.execute(
-            select(Employee).filter(Employee.id_employee == id_entity)
+        return await self.get(Employee.id_employee == id_entity)
+
+    async def get_all(self, filters: Filters) -> list[Employee]:
+        stmt = await self.apply_filters(select(Employee), filters)
+        return (await self.db.execute(stmt)).scalars().all()
+
+    async def get_combo(self, filters: Filters) -> list[ComboboxResponse[int]]:
+        stmt = self.apply_filters(
+            select(
+                Employee.surname,
+                Employee.name,
+                Employee.patronymic,
+                Employee.id_employee,
+                StoreEmployee.id_store,
+            ).outerjoin(
+                StoreEmployee, StoreEmployee.id_employee == Employee.id_employee
+            ),
+            filters,
         )
-        return result.scalar_one_or_none()
-
-    async def get_all(self) -> list[Employee]:
-        result = await self.db.execute(select(Employee))
-        return result.scalars().all()
-
-    async def get_combo(self) -> list[ComboboxResponse[int]]:
         result = []
-        for record in (await self.db.execute(select(Employee))).scalars().all():
+        for record in (await self.db.execute(stmt)).fetchall():
             result.append(
                 ComboboxResponse[int](
                     label=(
@@ -58,3 +64,7 @@ class EmployeeRepository:
             await self.db.delete(db_obj)
         await self.db.flush()
         return True
+
+
+def get_repository(db: AsyncSession) -> EmployeeRepository:
+    return EmployeeRepository(db)

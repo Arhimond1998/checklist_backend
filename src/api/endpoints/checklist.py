@@ -13,6 +13,7 @@ from src.schemas import (
     ChecklistTitlesResponse,
     ComboboxResponse,
 )
+from src.models.user import User
 from src.deps.database import get_db
 from src.deps.auth import get_current_user
 
@@ -25,9 +26,9 @@ async def create_checklist(
     request: Request,
     checklist: ChecklistCreate,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
-    repo = ChecklistRepository(db)
+    repo = ChecklistRepository(db, current_user)
     new_checklist = await repo.create(checklist)
     user_checklist_repo = UserChecklistRepository(db)
     await user_checklist_repo.create(
@@ -41,9 +42,14 @@ async def create_checklist(
 
 
 @router.post("/combobox", response_model=list[ComboboxResponse[int]])
-async def get_combobox(request: Request, db: AsyncSession = Depends(get_db)):
-    role_repo = ChecklistRepository(db)
+async def get_combobox(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    role_repo = ChecklistRepository(db, current_user)
     return await role_repo.get_combo()
+
 
 @router.post("/upload")
 @auth_service.check_components(["constructor"])
@@ -56,22 +62,30 @@ async def upload_photo(
 
 
 @router.get("/", response_model=list[ChecklistResponse])
-async def read_checklists(db: AsyncSession = Depends(get_db)):
-    repo = ChecklistRepository(db)
+async def read_checklists(
+    current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
+):
+    repo = ChecklistRepository(db, current_user)
     checklists = await repo.get_all()
     return checklists
 
 
 @router.get("/titles", response_model=list[ChecklistTitlesResponse])
-async def read_checklists_titles(db: AsyncSession = Depends(get_db)):
-    repo = ChecklistRepository(db)
+async def read_checklists_titles(
+    current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
+):
+    repo = ChecklistRepository(db, current_user)
     checklists = await repo.get_all()
     return checklists
 
 
 @router.get("/{id_checklist}", response_model=ChecklistResponse)
-async def read_checklist(id_checklist: int, db: AsyncSession = Depends(get_db)):
-    repo = ChecklistRepository(db)
+async def read_checklist(
+    id_checklist: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = ChecklistRepository(db, current_user)
     checklist = await repo.get_by_id(id_checklist)
     if not checklist:
         raise HTTPException(status_code=404, detail="checklist not found")
@@ -84,9 +98,10 @@ async def update_checklist(
     request: Request,
     id_checklist: int,
     checklist: ChecklistUpdate,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    repo = ChecklistRepository(db)
+    repo = ChecklistRepository(db, current_user)
     updated_checklist = await repo.update(id_checklist, checklist)
     if not updated_checklist:
         raise HTTPException(status_code=404, detail="checklist not found")
@@ -97,9 +112,12 @@ async def update_checklist(
 @router.delete("/{id_checklist}")
 @auth_service.check_components(["constructor"])
 async def delete_checklist(
-    request: Request, id_checklist: int, db: AsyncSession = Depends(get_db)
+    request: Request,
+    id_checklist: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    repo = ChecklistRepository(db)
+    repo = ChecklistRepository(db, current_user)
     success = await repo.delete(id_checklist)
     if not success:
         raise HTTPException(status_code=404, detail="checklist not found")

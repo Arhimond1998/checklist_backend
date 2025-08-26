@@ -1,4 +1,4 @@
-from src.schemas.base import ComboboxResponse, ComboboxTreeResponse  # noqa
+from src.schemas.base import ComboboxResponse, ComboboxTreeResponse, Filters  # noqa
 from src.schemas.checklist import (  # noqa
     ChecklistCreate,
     ChecklistResponse,

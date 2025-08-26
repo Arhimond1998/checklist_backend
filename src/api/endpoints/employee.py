@@ -7,6 +7,7 @@ from src.schemas import (
     EmployeeUpdate,
     EmployeeResponse,
     ComboboxResponse,
+    Filters,
 )
 from src.deps.database import get_db
 from src.services.auth import auth_service
@@ -43,9 +44,11 @@ async def read_employee(
 
 
 @router.post("/combobox", response_model=list[ComboboxResponse[int]])
-async def get_combobox(request: Request, db: AsyncSession = Depends(get_db)):
+async def get_combobox(
+    filters: Filters, request: Request, db: AsyncSession = Depends(get_db)
+):
     employee_repo = EmployeeRepository(db)
-    return await employee_repo.get_combo()
+    return await employee_repo.get_combo(filters)
 
 
 @router.put("/{employee_id}", response_model=EmployeeResponse)

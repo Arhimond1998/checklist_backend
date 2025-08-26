@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.checklist_user_report import (
     ChecklistUserReportRepository,
@@ -19,6 +19,7 @@ router = APIRouter(prefix="/checklist_user_reports", tags=["Report"])
 @router.post("/")
 @auth_service.check_components(["report"])
 async def create_user_report(
+    request: Request,
     data: ChecklistUserReportCreate,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
