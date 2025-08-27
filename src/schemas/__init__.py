@@ -21,7 +21,12 @@ from src.schemas.checklist_user_report import (  # noqa
     ChecklistUserReportFull,
 )
 from src.schemas.role import RoleCreate, RoleResponse, RoleUpdate  # noqa
-from src.schemas.user_role import UserRoleCreate, UserRoleResponse, UserRoleUpdate  # noqa
+from src.schemas.user_role import (  # noqa
+    UserRoleCreate,
+    UserRoleResponse,
+    UserRoleUpdate,
+    UserRoleFullResponse,
+)
 
 from src.schemas.employee import EmployeeCreate, EmployeeUpdate, EmployeeResponse  # noqa
 from src.schemas.store import StoreCreate, StoreUpdate, StoreResponse  # noqa
@@ -49,4 +54,9 @@ from src.schemas.role_component import (  # noqa
     RoleComponentCreate,
     RoleComponentFullResponse,
     RoleComponentResponse,
+)
+from src.schemas.role_checklist import (  # noqa
+    RoleChecklistCreate,
+    RoleChecklistFullResponse,
+    RoleChecklistResponse,
 )

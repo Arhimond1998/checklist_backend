@@ -7,7 +7,8 @@ class ChecklistBase(BaseModel):
 
 
 class ChecklistCreate(ChecklistBase):
-    id_store: list[int]
+    id_store: int
+    id_role: int
 
 
 class ChecklistUpdate(ChecklistCreate): ...

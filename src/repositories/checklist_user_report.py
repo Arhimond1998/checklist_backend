@@ -56,6 +56,7 @@ class ChecklistUserReportRepository(
                 ChecklistUserReport.id_checklist,
                 ChecklistUserReport.id_user,
                 ChecklistUserReport.id_employee,
+                ChecklistUserReport.commentary,
                 ChecklistUserReport.score,
                 ChecklistUserReport.max_score,
                 ChecklistUserReport.dt,
@@ -93,6 +94,7 @@ class ChecklistUserReportRepository(
                 id_checklist=r.id_checklist,
                 id_employee=r.id_employee,
                 id_user=r.id_user,
+                commentary=r.commentary,
                 score=r.score,
                 max_score=r.max_score,
                 dt=r.dt,
@@ -114,19 +116,32 @@ class ChecklistUserReportRepository(
                 ChecklistUserReport.id_checklist_user_report,
                 ChecklistUserReport.id_checklist,
                 ChecklistUserReport.id_user,
+                ChecklistUserReport.commentary,
                 ChecklistUserReport.score,
                 ChecklistUserReport.max_score,
                 ChecklistUserReport.dt,
                 ChecklistUserReport.data,
+                Store.id_store,
                 User.surname.concat(" ")
                 .concat(User.name)
                 .concat(" ")
                 .concat(User.patronymic)
                 .label("user_fullname"),
                 Checklist.title,
+                Store.name.label('name_store'),
+                Store.code.label('code_store'),
+                Employee.surname.concat(" ")
+                .concat(User.name)
+                .concat(" ")
+                .concat(User.patronymic)
+                .label("employee_fullname"),
             )
+            .select_from(ChecklistUserReport)
             .join(User, User.id_user == ChecklistUserReport.id_user)
             .join(Checklist, Checklist.id_checklist == ChecklistUserReport.id_checklist)
+            .join(StoreChecklist, StoreChecklist.id_checklist == Checklist.id_checklist)
+            .join(Store, Store.id_store == StoreChecklist.id_store)
+            .outerjoin(Employee, Employee.id_employee == ChecklistUserReport.id_employee)
             .where(
                 ChecklistUserReport.id_checklist_user_report == id_checklist_user_report
             )
@@ -136,11 +151,16 @@ class ChecklistUserReportRepository(
             id_checklist_user_report=record.id_checklist_user_report,
             id_checklist=record.id_checklist,
             id_user=record.id_user,
+            commentary=record.commentary,
+            id_store=record.id_store,
+            name_store=record.name_store,
+            code_store=record.code_store,
             score=record.score,
             max_score=record.max_score,
             dt=record.dt,
             title=record.title,
             user_fullname=record.user_fullname,
+            employee_fullname=record.employee_fullname,
             data=record.data,
         )
 

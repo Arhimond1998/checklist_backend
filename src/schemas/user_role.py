@@ -14,10 +14,20 @@ class UserRoleUpdate(UserRoleBase):
 
 
 class UserRoleResponse(BaseModel):
+    id_user_role: int
     id_user: int
-    id_role: str
+    id_role: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserRoleFullResponse(BaseModel):
+    id_user_role: int
+    id_user: int
+    id_role: int
     code_role: str
     name_role: str
     login: str
-
-    model_config = ConfigDict(from_attributes=True)
+    name: str
+    surname: str | None = None
+    patronymic: str | None = None

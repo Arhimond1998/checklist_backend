@@ -8,6 +8,7 @@ from src.models import User
 from src.models import Role
 from src.models import UserRole
 from src.models import StoreChecklist
+from src.models import RoleChecklist
 from src.models import StoreUser
 from src.schemas import ChecklistCreate, ChecklistUpdate, ComboboxResponse
 
@@ -18,14 +19,14 @@ class ChecklistRepository:
         self.user = user
 
     async def create(self, checklist: ChecklistCreate) -> Checklist:
-        new_checklist = Checklist(**checklist.model_dump(exclude=["id_store"]))
+        new_checklist = Checklist(**checklist.model_dump(exclude=["id_store", "id_role"]))
         self.db.add(new_checklist)
         await self.db.flush()
         await self.db.refresh(new_checklist)
         self.db.add_all(
             [
-                StoreChecklist(id_store=r, id_checklist=new_checklist.id_checklist)
-                for r in checklist.id_store
+                RoleChecklist(id_role=checklist.id_role, id_checklist=new_checklist.id_checklist),
+                StoreChecklist(id_store=checklist.id_store, id_checklist=new_checklist.id_checklist)
             ]
         )
         await self.db.flush()
@@ -67,25 +68,13 @@ class ChecklistRepository:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "Нет доступа к чеклисту")
 
         checklist = await self.get_by_id(id_checklist)
-        for k, v in checklist_update.model_dump(exclude=["id_store"]).items():
+        for k, v in checklist_update.model_dump(exclude=["id_store", "id_role"]).items():
             setattr(checklist, k, v)
-        stmt = select(StoreChecklist).where(StoreChecklist.id_checklist == id_checklist)
-
-        tuples = set((id_checklist, r) for r in checklist_update.id_store)
-        existed_tuples = set()
-        for r in await self.db.scalars(stmt):
-            key = (r.id_checklist, r.id_store)
-            if key not in tuples:
-                await self.db.delete(r)
-            else:
-                existed_tuples.add(key)
-
-        self.db.add_all(
-            [
-                StoreChecklist(id_checklist=t[0], id_store=t[1])
-                for t in (tuples - existed_tuples)
-            ]
-        )
+        store_record = await self.db.scalar(select(StoreChecklist).where(StoreChecklist.id_checklist == id_checklist))
+        role_record = await self.db.scalar(select(RoleChecklist).where(RoleChecklist.id_checklist == id_checklist))
+        
+        store_record.id_store = checklist_update.id_store
+        role_record.id_role = checklist_update.id_role
 
         await self.db.flush()
         await self.db.refresh(checklist)
@@ -100,10 +89,10 @@ class ChecklistRepository:
         if checklist:
             await self.db.delete(checklist)
 
-        for r in await self.db.scalars(
-            select(StoreChecklist).where(StoreChecklist.id_checklist == id_checklist)
-        ):
-            await self.db.delete(r)
+        store_record = await self.db.scalar(select(StoreChecklist).where(StoreChecklist.id_checklist == id_checklist))
+        role_record = await self.db.scalar(select(RoleChecklist).where(RoleChecklist.id_checklist == id_checklist))
+        await self.db.delete(store_record)
+        await self.db.delete(role_record)
 
         user_checklist = (
             await self.db.execute(
@@ -150,9 +139,8 @@ class ChecklistRepository:
                     StoreChecklist,
                     StoreChecklist.id_checklist == Checklist.id_checklist,
                 )
-                .join(StoreUser, StoreUser.id_store == StoreChecklist.id_store)
-                .join(UserRole, UserRole.id_user == StoreUser.id_user)
-                .where(UserRole.id_role.in_(roles), StoreUser.id_store.in_(stores))
+                .join(RoleChecklist, RoleChecklist.id_checklist == Checklist.id_checklist)
+                .where(RoleChecklist.id_role.in_(roles), StoreUser.id_store.in_(stores))
                 .distinct()
             )
         ).all()

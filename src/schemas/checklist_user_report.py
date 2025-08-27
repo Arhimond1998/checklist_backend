@@ -8,6 +8,7 @@ class ChecklistUserReportBase(BaseModel):
     max_score: int
     score: int
     data: dict
+    commentary: str | None = None
     id_employee: int | None = None
     dt: datetime = datetime.now()
 
@@ -26,6 +27,7 @@ class ChecklistUserReportTitle(BaseModel):
     employee_fullname: str | None = None
     name_store: str
     code_store: str
+    commentary: str | None = None
 
 
 class ChecklistUserReportFull(ChecklistUserReportTitle):
@@ -38,6 +40,7 @@ class ChecklistUserReportCreate(BaseModel):
     max_score: int
     score: int
     data: dict
+    commentary: str | None = None
 
 
 class ChecklistUserReportUpdate(ChecklistUserReportCreate):

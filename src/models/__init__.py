@@ -11,3 +11,4 @@ from src.models.store_user import StoreUser  # noqa
 from src.models.store_checklist import StoreChecklist  # noqa
 from src.models.component import Component  # noqa
 from src.models.role_component import RoleComponent  # noqa
+from src.models.role_checklist import RoleChecklist  # noqa

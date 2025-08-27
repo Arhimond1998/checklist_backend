@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy import Column, Integer, DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB
 from src.core.database import Base
 
@@ -15,4 +15,5 @@ class ChecklistUserReport(Base):
     max_score = Column(Integer)
     score = Column(Integer)
     data = Column(JSONB())
+    commentary = Column(String(255))
     dt = Column(DateTime, default=datetime.now)
