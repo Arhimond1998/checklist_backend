@@ -16,8 +16,8 @@ class EmployeeRepository(RepositoryBase[Employee, EmployeeCreate, EmployeeUpdate
         return await self.get(Employee.id_employee == id_entity)
 
     async def get_all(self, filters: Filters) -> list[Employee]:
-        stmt = await self.apply_filters(select(Employee), filters)
-        return (await self.db.execute(stmt)).scalars().all()
+        stmt = self.apply_filters(select(Employee), filters)
+        return (await self.db.execute(stmt)).fetchall()
 
     async def get_combo(self, filters: Filters) -> list[ComboboxResponse[int]]:
         stmt = self.apply_filters(

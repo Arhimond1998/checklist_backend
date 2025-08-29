@@ -26,10 +26,10 @@ async def create_employee(
     return new_obj
 
 
-@router.get("/", response_model=list[EmployeeResponse])
-async def read_employees(request: Request, db: AsyncSession = Depends(get_db)):
+@router.post("/get_all", response_model=list[EmployeeResponse])
+async def read_employees(request: Request, filters: Filters, db: AsyncSession = Depends(get_db)):
     repo = EmployeeRepository(db)
-    return await repo.get_all()
+    return await repo.get_all(filters)
 
 
 @router.get("/{employee_id}", response_model=EmployeeResponse)
