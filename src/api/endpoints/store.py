@@ -56,6 +56,7 @@ async def update_store(
     updated_store = await repo.update(store_id, store)
     if not updated_store:
         raise HTTPException(status_code=404, detail="store not found")
+    await db.commit()
     return updated_store
 
 
