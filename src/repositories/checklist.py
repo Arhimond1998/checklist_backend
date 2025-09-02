@@ -201,6 +201,9 @@ class ChecklistRepository(RepositoryBase):
         return True
 
     async def get_user_access_checklist(self) -> list[int]:
+        if self.user.id_user == 1:
+            return (await self.db.scalars(select(Checklist.id_checklist))).all()
+        
         id_role = await self.db.scalar(
             select(UserRole.id_role).where(UserRole.id_user == self.user.id_user)
         )
