@@ -114,7 +114,7 @@ class ChecklistRepository(RepositoryBase):
     ) -> list[ChecklistFullResponse]:
         allowed_checklists = await self.get_user_access_checklist()
         if not allowed_checklists:
-            return HTTPException(status.HTTP_404_NOT_FOUND, "No checklist found")
+            return []
         stmt = self.apply_filters(
             (
                 select(
