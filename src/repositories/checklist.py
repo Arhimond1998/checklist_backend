@@ -241,7 +241,7 @@ class ChecklistRepository(RepositoryBase):
                 .join(
                     RoleChecklist, RoleChecklist.id_checklist == Checklist.id_checklist
                 )
-                .where(RoleChecklist.id_role.in_(roles), StoreUser.id_store.in_(stores))
+                .where(RoleChecklist.id_role.in_(roles), StoreChecklist.id_store.in_(stores))
                 .distinct()
             )
         ).all()

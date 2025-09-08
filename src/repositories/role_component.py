@@ -1,14 +1,14 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import RoleComponent, Role, Component
-from src.schemas import RoleChecklistCreate, RoleChecklistFullResponse
+from src.schemas import RoleComponentCreate, RoleComponentFullResponse
 
 
 class RoleComponentRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create(self, create_dto: RoleChecklistCreate) -> RoleComponent:
+    async def create(self, create_dto: RoleComponentCreate) -> RoleComponent:
         new_obj = RoleComponent(**create_dto.model_dump())
         self.db.add(new_obj)
         await self.db.flush()
@@ -21,7 +21,7 @@ class RoleComponentRepository:
         )
         return result.scalar_one_or_none()
 
-    async def get_all_full(self) -> list[RoleChecklistFullResponse]:
+    async def get_all_full(self) -> list[RoleComponentFullResponse]:
         result = await self.db.execute(
             select(
                 RoleComponent.id_role_component,
@@ -37,7 +37,7 @@ class RoleComponentRepository:
             .join(Component, Component.id_component == RoleComponent.id_component)
         )
         return [
-            RoleChecklistFullResponse(
+            RoleComponentFullResponse(
                 name_component=r.name_component,
                 code_component=r.code_component,
                 name_role=r.name_role,
