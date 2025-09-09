@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models import User, UserRole, Role, Component, RoleComponent
-from src.schemas import UserCreate, UserUpdate, ComboboxResponse
+from src.schemas import UserCreate, UserUpdate, ComboboxResponse, UserChangePassword
 from src.deps.database import get_db
 
 
@@ -21,6 +21,14 @@ class UserRepository:
         await self.db.flush()
         await self.db.refresh(new_user)
         return new_user
+
+    async def change_password(self, user: UserChangePassword) -> bool:
+        user_db = await self.db.scalar(select(User).where(User.login == user.login))
+        if not user_db:
+            raise UserNotFound("No user")
+        user_db.password = user.password
+        await self.db.flush()
+        return True
 
     async def get_by_id(self, id_user: int) -> User | None:
         result = await self.db.execute(select(User).filter(User.id_user == id_user))
@@ -71,7 +79,7 @@ class UserRepository:
             .scalars()
             .all()
         )
-        
+
     async def get_components(self, id_user: int) -> list[str]:
         return (
             (
@@ -79,14 +87,15 @@ class UserRepository:
                     select(Component.code)
                     .select_from(UserRole)
                     .join(RoleComponent, UserRole.id_role == RoleComponent.id_role)
-                    .join(Component, Component.id_component == RoleComponent.id_component)
+                    .join(
+                        Component, Component.id_component == RoleComponent.id_component
+                    )
                     .where(UserRole.id_user == id_user)
                 )
             )
             .scalars()
             .all()
         )
-
 
     async def delete(self, id_user: int) -> bool:
         User = await self.get_by_id(id_user)

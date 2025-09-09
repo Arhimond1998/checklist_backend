@@ -13,13 +13,19 @@ class UserBase(BaseModel):
 class UserCreate(UserBase): ...
 
 
-class UserUpdate(BaseModel): 
+class UserUpdate(BaseModel):
     name: str
     surname: str | None = None
     patronymic: str | None = None
     mail: str | None = None
 
+
 class UserLogin(BaseModel):
+    login: str
+    password: str
+
+
+class UserChangePassword(BaseModel):
     login: str
     password: str
 
@@ -34,6 +40,7 @@ class UserResponseLogin(BaseModel):
     access_token: str
     roles: list[str] | None = None
     components: list[str] | None = None
+
 
 class UserResponse(BaseModel):
     id_user: int

@@ -2,7 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.repositories.user import UserRepository
-from src.schemas import UserCreate, UserUpdate, UserResponse, ComboboxResponse
+from src.schemas import (
+    UserCreate,
+    UserUpdate,
+    UserResponse,
+    ComboboxResponse,
+    UserChangePassword,
+)
 from src.deps.database import get_db
 from src.services.auth import auth_service
 
@@ -19,6 +25,18 @@ async def create_user(
     new_user = await user_repo.create(user)
     await db.commit()
     return new_user
+
+
+@router.post("/change_password")
+@auth_service.check_roles(["admin"])
+async def change_password(
+    request: Request, user: UserChangePassword, db: AsyncSession = Depends(get_db)
+):
+    user_repo = UserRepository(db)
+    user.password = auth_service.hash_password(user.password)
+    await user_repo.change_password(user)
+    await db.commit()
+    return True
 
 
 @router.post("/combobox", response_model=list[ComboboxResponse[int]])

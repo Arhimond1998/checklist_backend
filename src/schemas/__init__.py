@@ -13,6 +13,7 @@ from src.schemas.user import (  # noqa
     UserResponse,
     UserUpdate,
     UserLogin,
+    UserChangePassword,
 )
 from src.schemas.user_checklist import UserChecklistCreate  # noqa
 from src.schemas.token import Token  # noqa
