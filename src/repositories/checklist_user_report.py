@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import ChecklistUserReport
 from src.models import User
@@ -60,21 +60,18 @@ class ChecklistUserReportRepository(
                 ChecklistUserReport.score,
                 ChecklistUserReport.max_score,
                 ChecklistUserReport.dt,
-                User.surname.concat(" ")
-                .concat(User.name)
-                .concat(" ")
-                .concat(User.patronymic)
-                .label("user_fullname"),
-                Employee.surname.concat(" ")
-                .concat(Employee.name)
-                .concat(" ")
-                .concat(Employee.patronymic)
-                .label("employee_fullname"),
+                User.surname.label("user_surname"),
+                User.name.label("user_name"),
+                User.patronymic.label("user_patronymic"),
+                Employee.surname.label("employee_surname"),
+                Employee.name.label("employee_name"),
+                Employee.patronymic.label("employee_patronymic"),
                 Checklist.title,
                 Store.name.label("name_store"),
                 Store.code.label("code_store"),
                 Store.id_store,
             )
+            .select_from(ChecklistUserReport)
             .join(User, User.id_user == ChecklistUserReport.id_user)
             .join(Checklist, Checklist.id_checklist == ChecklistUserReport.id_checklist)
             .join(
@@ -99,8 +96,12 @@ class ChecklistUserReportRepository(
                 max_score=r.max_score,
                 dt=r.dt,
                 title=r.title,
-                user_fullname=r.user_fullname,
-                employee_fullname=r.employee_fullname,
+                user_fullname=(r.user_surname or "").strip()
+                + (r.user_name or "").strip()
+                + (r.user_patronymic or "").strip(),
+                employee_fullname=(r.employee_surname or "").strip()
+                + (r.employee_name or "").strip()
+                + (r.employee_patronymic or "").strip(),
                 name_store=r.name_store,
                 code_store=r.code_store,
                 id_store=r.id_store,
@@ -128,8 +129,8 @@ class ChecklistUserReportRepository(
                 .concat(User.patronymic)
                 .label("user_fullname"),
                 Checklist.title,
-                Store.name.label('name_store'),
-                Store.code.label('code_store'),
+                Store.name.label("name_store"),
+                Store.code.label("code_store"),
                 Employee.surname.concat(" ")
                 .concat(User.name)
                 .concat(" ")
@@ -141,7 +142,9 @@ class ChecklistUserReportRepository(
             .join(Checklist, Checklist.id_checklist == ChecklistUserReport.id_checklist)
             .join(StoreChecklist, StoreChecklist.id_checklist == Checklist.id_checklist)
             .join(Store, Store.id_store == StoreChecklist.id_store)
-            .outerjoin(Employee, Employee.id_employee == ChecklistUserReport.id_employee)
+            .outerjoin(
+                Employee, Employee.id_employee == ChecklistUserReport.id_employee
+            )
             .where(
                 ChecklistUserReport.id_checklist_user_report == id_checklist_user_report
             )

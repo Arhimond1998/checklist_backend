@@ -3,7 +3,7 @@ from typing import Any, Generic, Type, TypeVar
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy import select, delete, Select
+from sqlalchemy import select, delete, Select, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.elements import BinaryExpression
 
@@ -92,7 +92,7 @@ class RepositoryBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         op_map = {
             "eq": lambda x, y: x == y,
             "in": lambda x, y: x.in_(y),
-            "date_eq": lambda x, y: x == datetime.datetime.fromisoformat(y),
+            "date_eq": lambda x, y: cast(x, Date) == datetime.datetime.fromisoformat(y),
         }
         stmt = select(statement.subquery("res"))
         for flt in filters.filters:
