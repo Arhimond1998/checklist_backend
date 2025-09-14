@@ -23,7 +23,7 @@ class AuthService:
                 headers = kwargs.get("request").headers
                 token = headers["Authorization"].split(" ")[-1]
                 data = AuthService.decode_access_token(token)
-                user_roles = data['roles']
+                user_roles = data["roles"]
                 if len(set(user_roles) & set(roles)) == 0:
                     raise HTTPException(
                         status_code=403, detail="У вас нет прав доступа"
@@ -34,7 +34,7 @@ class AuthService:
             return wrapped
 
         return decorator
-    
+
     @staticmethod
     def check_components(components: list[str]):
         """
@@ -47,7 +47,7 @@ class AuthService:
                 headers = kwargs.get("request").headers
                 token = headers["Authorization"].split(" ")[-1]
                 data = AuthService.decode_access_token(token)
-                user_components = data['components']
+                user_components = data["components"]
                 if len(set(user_components) & set(components)) == 0:
                     raise HTTPException(
                         status_code=403, detail="У вас нет прав доступа"
@@ -81,7 +81,7 @@ class AuthService:
         # Verify password, raises exception if wrong.
         try:
             ph.verify(password_hash, password)
-        except argon2.VerifyMismatchError:
+        except argon2.exceptions.VerifyMismatchError:
             return False
         except Exception as e:
             print(e)

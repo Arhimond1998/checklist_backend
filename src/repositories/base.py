@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Generic, Type, TypeVar
 
 from fastapi.encoders import jsonable_encoder
@@ -88,12 +89,14 @@ class RepositoryBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         await self.db.execute(delete(self.model).filter(*args).filter_by(**kwargs))
 
     def apply_filters(self, statement: Select, filters: Filters) -> Select:
-        op_map = {"eq": lambda x, y: x == y, "in": lambda x, y: x.in_(y)}
-        stmt = select(statement.subquery('res'))
+        op_map = {
+            "eq": lambda x, y: x == y,
+            "in": lambda x, y: x.in_(y),
+            "date_eq": lambda x, y: x == datetime.datetime.fromisoformat(y),
+        }
+        stmt = select(statement.subquery("res"))
         for flt in filters.filters:
             stmt = stmt.where(
-                op_map[flt.operator](
-                    stmt.selected_columns.get(flt.property), flt.value
-                )
+                op_map[flt.operator](stmt.selected_columns.get(flt.property), flt.value)
             )
         return stmt
